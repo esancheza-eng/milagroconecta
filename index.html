@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Milagro Conecta · Comercio, servicios y empleo de Milagro</title>
+<meta name="description" content="Encuentra negocios, servicios, emprendimientos y ofertas de empleo de Milagro en un solo lugar. Publica tu negocio o sube tu hoja de vida.">
+<meta name="theme-color" content="#071a3d">
+<meta property="og:title" content="Milagro Conecta">
+<meta property="og:description" content="Comercio · Servicios · Emprendimientos de nuestro cantón. ¡Todo Milagro en un solo lugar!">
+<meta property="og:image" content="https://milagroconecta.elhyai.com/og.jpg">
+<meta property="og:type" content="website">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="anuncio" class="anuncio" hidden></div>
+<header class="top">
+  <a class="brand" href="#/"><span class="bi">📱</span><b>Milagro</b><i>Conecta</i></a>
+  <nav class="dnav">
+    <a href="#/negocios" data-nav="negocios">Negocios</a>
+    <a href="#/empleos" data-nav="empleos">Empleos</a>
+    <a href="#/talento" data-nav="talento">Talento</a>
+    <a href="#/planes" data-nav="planes">Planes</a>
+  </nav>
+  <div class="right"><button id="btnInstalar" class="btn mini ghost" hidden>⬇ Instalar</button><a id="btnCuenta" class="btn mini" href="#/ingresar">Ingresar</a></div>
+</header>
+<main id="app"></main>
+<nav class="bnav">
+  <a href="#/" data-nav="home"><span>🏠</span>Inicio</a>
+  <a href="#/negocios" data-nav="negocios"><span>🛍️</span>Negocios</a>
+  <a href="#/empleos" data-nav="empleos"><span>💼</span>Empleos</a>
+  <a href="#/talento" data-nav="talento"><span>🧑‍💼</span>Talento</a>
+  <a href="#/panel" data-nav="panel"><span>👤</span>Mi cuenta</a>
+</nav>
+<div id="modal"></div>
+<div id="toast"></div>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script type="module" src="app.js"></script>
+</body>
+</html>

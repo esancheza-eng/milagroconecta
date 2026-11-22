@@ -1,0 +1,97 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signed()      { return request.auth != null; }
+    function isOwner(uid)  { return signed() && request.auth.uid == uid; }
+    function isAdmin()     { return signed() && exists(/databases/$(database)/documents/admins/$(request.auth.uid)); }
+
+    // Campos que SOLO el administrador puede cambiar
+    function protegidos() {
+      return ['plan','planHasta','destacado','vistas','clicsWhatsapp','clicsLlamar','ownerId','createdAt','motivo'];
+    }
+    function ownerEdita() {
+      return request.resource.data.estado == 'pendiente'
+        && !request.resource.data.diff(resource.data).affectedKeys().hasAny(protegidos());
+    }
+    // Contadores públicos: solo +1 en un campo
+    function suma1(campo) {
+      return request.resource.data.diff(resource.data).affectedKeys().hasOnly([campo])
+        && request.resource.data[campo] == resource.data[campo] + 1;
+    }
+    function contador() {
+      return resource.data.estado == 'aprobado'
+        && (suma1('vistas') || suma1('clicsWhatsapp') || suma1('clicsLlamar'));
+    }
+    function imgOk(v) { return v is string && v.size() < 300000 && v[0:11] == 'data:image/'; }
+
+    // ---- Administradores (se crean a mano en la consola) ----
+    match /admins/{uid} {
+      allow read: if isOwner(uid);
+      allow write: if false;
+    }
+
+    // ---- Configuración pública (precios, datos de pago, anuncio) ----
+    match /config/{d} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // ---- Negocios ----
+    match /negocios/{id} {
+      allow read: if resource.data.estado == 'aprobado' || isOwner(resource.data.ownerId) || isAdmin();
+      allow create: if signed()
+        && request.resource.data.ownerId == request.auth.uid
+        && request.resource.data.estado == 'pendiente'
+        && request.resource.data.plan == 'gratis'
+        && request.resource.data.destacado == false
+        && request.resource.data.vistas == 0
+        && request.resource.data.clicsWhatsapp == 0
+        && request.resource.data.clicsLlamar == 0
+        && imgOk(request.resource.data.imagen);
+      allow update: if isAdmin()
+        || (isOwner(resource.data.ownerId) && ownerEdita() && imgOk(request.resource.data.imagen))
+        || contador();
+      allow delete: if isOwner(resource.data.ownerId) || isAdmin();
+    }
+
+    // ---- Perfiles (id = uid del usuario) ----
+    match /perfiles/{uid} {
+      allow read: if resource.data.estado == 'aprobado' || isOwner(uid) || isAdmin();
+      allow create: if isOwner(uid)
+        && request.resource.data.ownerId == uid
+        && request.resource.data.estado == 'pendiente'
+        && request.resource.data.plan == 'gratis'
+        && request.resource.data.destacado == false;
+      allow update: if isAdmin() || (isOwner(uid) && ownerEdita());
+      allow delete: if isOwner(uid) || isAdmin();
+
+      // Contacto: solo usuarios con sesión iniciada
+      match /contacto/{d} {
+        allow read: if signed() && (isOwner(uid) || isAdmin()
+          || get(/databases/$(database)/documents/perfiles/$(uid)).data.estado == 'aprobado');
+        allow write: if isOwner(uid) || isAdmin();
+      }
+    }
+
+    // ---- Ofertas de empleo ----
+    match /empleos/{id} {
+      allow read: if resource.data.estado == 'aprobado' || isOwner(resource.data.ownerId) || isAdmin();
+      allow create: if signed()
+        && request.resource.data.ownerId == request.auth.uid
+        && request.resource.data.estado == 'pendiente'
+        && get(/databases/$(database)/documents/negocios/$(request.resource.data.negocioId)).data.ownerId == request.auth.uid;
+      allow update: if isAdmin();
+      allow delete: if isOwner(resource.data.ownerId) || isAdmin();
+    }
+
+    // ---- Solicitudes de plan (pagos) ----
+    match /solicitudes/{id} {
+      allow read: if isOwner(resource.data.ownerId) || isAdmin();
+      allow create: if signed()
+        && request.resource.data.ownerId == request.auth.uid
+        && request.resource.data.estado == 'pendiente';
+      allow update, delete: if isAdmin();
+    }
+  }
+}
