@@ -5,12 +5,12 @@
 //  2) Ajusta precios y dominio si hace falta
 // ============================================================
 export const firebaseConfig = {
-  apiKey: "PEGA_AQUI_TU_API_KEY",
-  authDomain: "TU-PROYECTO.firebaseapp.com",
-  projectId: "TU-PROYECTO",
-  storageBucket: "TU-PROYECTO.appspot.com",
-  messagingSenderId: "000000000000",
-  appId: "1:000000000000:web:0000000000000000"
+  apiKey: "AIzaSyDOkCM9wLp_2UCxNmYHGoZqzILNVdp5AZo",
+  authDomain: "milagro-conecta.firebaseapp.com",
+  projectId: "milagro-conecta",
+  storageBucket: "milagro-conecta.firebasestorage.app",
+  messagingSenderId: "813537951460",
+  appId: "1:813537951460:web:fc9f62d92813b0afa5f6f1"
 };
 
 export const APP = {
